@@ -1,0 +1,9 @@
+---
+
+sentry_venv: /opt/venv/sentry
+sentry_run: /srv/run/sentry
+sentry_files: /srv/sentry-files
+sentry_components:
+  - celery-beat
+  - celery-worker
+  - sentry

@@ -1,0 +1,3 @@
+.env
+packer/packer_cache/**
+terraform/.terraform/**

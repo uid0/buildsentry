@@ -1,0 +1,5 @@
+sentry_venv_location: /srv/www/virtualenv
+sentry_org_name: iwcincy.xyz
+sentry_team_name: devops
+sentry_project_name: project
+sentry_client_public_key:

@@ -1,0 +1,93 @@
+---
+
+- name: Ensure APT packages are installed
+  apt:
+    name: ['gcc', 'python-virtualenv', 'python-setuptools', 'python-pip', 'libxslt1-dev', 'libffi-dev', 'libjpeg-dev', 'libxml2-dev', 'libyaml-dev', 'python-dev', 'libpq-dev', 'nginx', 'supervisor', 'nodejs']
+    state: present
+    force_apt_get: yes
+
+- name: Ensure /etc/sentry exists
+  file:
+    path: /etc/sentry
+    state: directory
+
+- name: Ensure Sentry is configured
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/sentry/{{ item }}"
+  with_items:
+    - config.yml
+    - sentry.conf.py
+
+- name: Ensure group exists
+  group:
+    name: sentry
+    state: present
+
+- name: Ensure user exists
+  user:
+    name: sentry
+    group: sentry
+    home: /nonexistant
+    shell: /bin/false
+    state: present
+
+- name: Ensure Sentry-web service exists
+  template:
+    src: "{{item}}.service.j2"
+    dest: "/lib/systemd/system/{{item}}.service"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - sentry-web
+    - sentry-worker
+    - sentry-cron
+
+- name: Ensure Sentry's systemd files are set up in systemd
+  systemd:
+    enabled: yes
+    name: "{{ item }}"
+  with_items:
+    - sentry-worker
+    - sentry-cron
+    - sentry-web
+
+- name: Ensure Sentry's systemd files are set up in systemd to run...
+  systemd:
+    state: started
+    name: "{{ item }}"
+  with_items:
+    - sentry-worker
+    - sentry-cron
+    - sentry-web
+
+- name: remove default symlink
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Get the nginx config in the right location
+  template:
+    src: sentry-config.j2
+    dest: /etc/nginx/sites-available/sentry
+
+- name: Move the file to enabled
+  file:
+    src: /etc/nginx/sites-available/sentry
+    dest: /etc/nginx/sites-enabled/sentry
+    state: link
+
+- name: Recursively change the directory structure of Sentry home directory
+  file:
+    path: "{{ sentry_venv_location }}"
+    state: directory
+    recurse: yes
+    owner: sentry
+    group: sentry
+
+
+- name: restart nginx
+  systemd:
+    name: nginx
+    state: restarted

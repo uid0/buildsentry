@@ -1,0 +1,55 @@
+# vim:ft=python:
+#===============================================================================
+#
+# Bootstrap the Sentry environment
+#
+#
+# Inspired by https://docs.getsentry.com/on-premise/server/faq/
+#-------------------------------------------------------------------------------
+# {{ ansible_managed }}
+#===============================================================================
+
+from sentry.utils.runner import configure
+configure()
+
+from sentry.models import (
+Team, Project, ProjectKey, User, Organization, OrganizationMember,
+OrganizationMemberTeam
+)
+
+organization, o = Organization.objects.get_or_create(
+	name = '{{ sentry_org_name }}'
+)
+
+teams, t = Teams.objects.get_or_create(
+	name='{{ sentry_team_name }}',
+	organization=organization
+)
+
+project, p = Project.objects.get_or_create(
+	team=team,
+	name='{{ sentry_project_name }}',
+	organization=organization
+)
+
+user = User()
+user.username = 'ian'
+user.email = 'me@ianwilson.org'
+user.is_superuser = True
+user.set_password('admin')
+user.save()
+
+member = OrganizationMember.objects.create(
+     organization=organization,
+     user=user,
+     role='owner',
+)
+
+OrganizationMemberTeam.objects.create(
+    organizationmember=member,
+    team=team,
+)
+
+
+if o or t or p:
+	print "changed"

@@ -1,0 +1,62 @@
+---
+
+# This ensures that all packages are up to date and that the cache is always
+# up-to-date for when sysad's do maintenance or anything like that.
+
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+    upgrade: "full"
+    update_cache: yes
+    cache_valid_time: 86400
+    force_apt_get: yes
+  ignore_errors: yes
+
+
+# Install ZSH
+- name: Install ZSH and Git
+  apt:
+    pkg: zsh,git,mosh
+    state: present
+    force_apt_get: yes
+  register: installation
+  ignore_errors: yes
+
+
+- name: Create the "sysadmin" group
+  group:
+    gid: "6001"
+    name: sysadmin
+
+# Ensure users are created.
+
+- name: Create Ian's Group
+  group:
+    gid: "5001"
+    name: iwilson
+
+- name: Create Ian's Account
+  user:
+    name: iwilson
+    comment: Ian Wilson
+    password: $6$AMcWgYmMfWzVFZ$d0jo4fpVB4lMBZUMxT6dnHDEZmUYrP.spV79ze4LzjxPchZZ36pJdduQtomgFxZ8x0ijEdqXxZLHyYlW.Pfi.0
+    uid: "5001"
+    group: iwilson
+    groups: sudo, sysadmin
+    shell: /usr/bin/zsh
+    home: /home/iwilson
+
+- name: Chown ian's directory with proper id's
+  file:
+    dest: /home/iwilson
+    owner: iwilson
+    group: iwilson
+    mode: u=rwX,g=rX,o=rX
+
+- name: Create Ian's .Authorized_keys
+  authorized_key:
+    user: iwilson
+    state: present
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDVdI1nZrnhBtZfKno29BwT98XCE6XDqSzCOpnAgijhqpPEfd42GnJk7VEWORWX1BefkYgrYjJDV6NUV4y/7Y4dpTGObxJNegBf6qKhFElWtZ3OUjsXftfaozfqi+qS4YeKKc8GzgLeDuLnp/hpoiF5AuIz9vMwhXnsuMxsh9EhsnbgzbSGz2oPyHMTlHJ8x6spkdSG0AUsSrEy5jsagv3tqRHR9jPPDO5g2dxiaBoQDLpB9+DGaQgxO/aDDI9EeybMBnpgC57Cmq5V4W2J2agEAK895X5IR8Y4qnf3ETXXLLYfdObx5/0YqgvX9RhcuG+TWXJbBTXhF0U6R98x2DSB ian@ianwilson.org" # noqa 204
+  tags:
+  - skip_ansible_lint

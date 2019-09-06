@@ -1,0 +1,5 @@
+---
+
+- name: Restart sentry
+  command: "sv restart {{ item }}"
+  with_items: "{{ sentry_components }}"

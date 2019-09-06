@@ -1,0 +1,50 @@
+---
+sentry_venv_location: /srv/www/sentry
+sentry_secret_key: aechie9cee1uth1eiQu8iekootheephe
+sentry_client_public_key: du3nah5chohF1eghaeraaw5ajeethie4
+sentry_client_secret_key: eiK8avaihu2QuieMoo0LiSobieh4eij5
+
+
+# Sentry will run as this user
+sentry_user: sentry
+
+# 
+# Database
+#
+sentry_db_engine: sentry.db.postgres
+sentry_db_name: sentrydb
+sentry_db_user: sentrydb
+sentry_db_password: sentrydb
+sentry_db_host: terraform-20190828040251790100000001.c895fmnyjack.us-east-1.rds.amazonaws.com
+sentry_db_port:
+
+#
+# Email Sending
+#
+sentry_mail_backend: 'smtp'  # Use dummy if you want to disable email entirely
+sentry_mail_host: 'localhost'
+sentry_mail_port: 25
+sentry_mail_username: ''
+sentry_mail_password: ''
+sentry_mail_use_tls: false
+# The email address to send on behalf of
+sentry_mail_from: 'root@localhost'
+
+#
+# Redis
+# 
+sentry_redis_host: sentry-redis-cache.qttaos.0001.use1.cache.amazonaws.com
+sentry_redis_port: 6379
+
+# 
+# Web
+#
+sentry_web_host: '0.0.0.0'
+sentry_port: 9000
+
+#
+# Bootstrap
+#
+sentry_org_name: Sentry
+sentry_team_name: Sentry
+sentry_project_name: "My Project"

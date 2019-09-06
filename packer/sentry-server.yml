@@ -1,0 +1,9 @@
+# This is the server role for sentry server built and managed by ansible
+
+- hosts: all
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  roles:
+    - common
+    - sentry-install
